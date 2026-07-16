@@ -1,0 +1,115 @@
+diff --git a/node_modules/hexo-theme-solitude/layout/includes/widgets/aside/asideFriend.pug b/node_modules/hexo-theme-solitude/layout/includes/widgets/aside/asideFriend.pug
+new file mode 100644
+index 0000000..6d1201c
+--- /dev/null
++++ b/node_modules/hexo-theme-solitude/layout/includes/widgets/aside/asideFriend.pug
+@@ -0,0 +1,68 @@
++if theme.aside_friend_card && theme.aside_friend_card.enable
++  //- 针对该卡片的专属深色与主题色样式
++  style.
++    .dark-friend-card {
++      background: #1e1e1e !important;
++      border: 1px solid #333 !important;
++    }
++    .dark-friend-content { padding: 0 15px 15px 15px; }
++    .dark-fl-item {
++      display: flex;
++      align-items: center;
++      padding: 8px 10px;
++      margin-top: 10px;
++      border-radius: 8px;
++      background: #2a2a2a; /* 深色内部卡片背景 */
++      text-decoration: none;
++      transition: all 0.3s ease;
++    }
++    .dark-fl-item img {
++      width: 36px;
++      height: 36px;
++      border-radius: 50%;
++      margin-right: 12px;
++      object-fit: cover;
++    }
++    .dark-fl-item .fl-info { flex: 1; min-width: 0; }
++    .dark-fl-item .fl-name {
++      font-size: 14px;
++      font-weight: 600;
++      color: #eaeaea;
++      white-space: nowrap;
++      overflow: hidden;
++      text-overflow: ellipsis;
++      transition: color 0.3s ease;
++    }
++    .dark-fl-item .fl-desc {
++      font-size: 12px;
++      color: #a0a0a0;
++      margin-top: 4px;
++      white-space: nowrap;
++      overflow: hidden;
++      text-overflow: ellipsis;
++      transition: color 0.3s ease;
++    }
++    /* 核心修改：鼠标悬浮时背景变为 #ffc848，文字变为深色以保证对比度 */
++    .dark-fl-item:hover {
++      background: #ffc848;
++      transform: scale(1.02);
++    }
++    .dark-fl-item:hover .fl-name { color: #1e1e1e; }
++    .dark-fl-item:hover .fl-desc { color: #444; }
++
++  //- 卡片结构：保留了原有 class 组合以兼容框架动画和边距
++  .card-widget.card-recent-post.dark-friend-card
++    .item-headline
++      //- 动态读取 yaml 里的 icon 和 title
++      i(class=theme.aside_friend_card.icon)
++      span= theme.aside_friend_card.title
++    .dark-friend-content
++      //- 遍历 yaml 里的 links 数组
++      if theme.aside_friend_card.links
++        each item in theme.aside_friend_card.links
++          a.dark-fl-item(href=item.url target="_blank" title=item.name)
++            if item.avatar
++              img(src=item.avatar alt=item.name)
++            .fl-info
++              .fl-name= item.name
++            //-   .fl-desc= item.desc
+\ No newline at end of file
+diff --git a/node_modules/hexo-theme-solitude/layout/includes/widgets/aside/asideHitokoto.pug b/node_modules/hexo-theme-solitude/layout/includes/widgets/aside/asideHitokoto.pug
+new file mode 100644
+index 0000000..1c75b45
+--- /dev/null
++++ b/node_modules/hexo-theme-solitude/layout/includes/widgets/aside/asideHitokoto.pug
+@@ -0,0 +1,18 @@
++.card-widget.card-recent-post
++    .item-headline
++        i.solitude.fas.fa-comment-dots
++        span= "一言"
++    //- 核心修改 1：加上 padding: 0 15px; 让整个内容区左右往里收缩 15 像素
++    .hitokoto-content(style="padding: 0 15px;")
++        //- 核心修改 2：加上 text-align: center; 让文字本身居中（如果你不想文字居中，删掉这句即可）
++        p#hitokoto_text(style="font-size: 14px; margin-top: 10px; line-height: 1.5;") 正在连接宇宙电波...
++        //- 作者文本保持靠右对齐
++        p#hitokoto_author(style="font-size: 13px; margin-top: 8px; text-align: right; opacity: 0.8;")
++    script.
++        fetch('https://v1.hitokoto.cn')
++        .then(res => res.json())
++        .then(data => {
++            document.getElementById('hitokoto_text').innerText = data.hitokoto;
++            document.getElementById('hitokoto_author').innerText = '—— ' + (data.from || '佚名');
++        })
++        .catch(console.error);
+\ No newline at end of file
+diff --git a/node_modules/hexo-theme-solitude/layout/includes/widgets/aside/asideSwitch.pug b/node_modules/hexo-theme-solitude/layout/includes/widgets/aside/asideSwitch.pug
+index e0783ea..eb29c3b 100644
+--- a/node_modules/hexo-theme-solitude/layout/includes/widgets/aside/asideSwitch.pug
++++ b/node_modules/hexo-theme-solitude/layout/includes/widgets/aside/asideSwitch.pug
+@@ -16,6 +16,10 @@ case item
+     include ./asideAdsense.pug
+   when 'newest_comment'
+     include ./asideNewstComments.pug
++  when 'hitokoto'
++    include ./asideHitokoto.pug
++  when 'friend'
++    include ./asideFriend.pug
+   default
+     //- 处理自定义组件
+     - const custom = site.data && site.data.aside && site.data.aside.find((i) => i.name === item)
